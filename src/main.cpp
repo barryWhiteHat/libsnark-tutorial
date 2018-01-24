@@ -62,7 +62,7 @@ void r1cs_to_json(r1cs_constraint_system<FieldT> constraints)
     for (size_t i = 0; i < constraints.num_variables(); ++i)
     {   
         std::cout << constraints.variable_annotations[i].c_str();
-        if (i < constraints.num_variables()) {
+        if (i < constraints.num_variables() - 1) {
             std::cout << ", ";
         }
         //values[i].as_bigint().print_hex();
