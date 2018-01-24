@@ -58,11 +58,16 @@ void r1cs_to_json(r1cs_constraint_system<FieldT> constraints)
 
 // output inputs, right now need to compile with debug flag so that the `variable_annotations`
 // exists. Having trouble setting that up so will leave for now.
-//    for (size_t i = 0; i < constraints.num_variables(); ++i)
-//    {   
-//        printf("%-40s --> ", constraints.variable_annotations[i].c_str());
+    std::cout << " s = [    ";
+    for (size_t i = 0; i < constraints.num_variables(); ++i)
+    {   
+        std::cout << constraints.variable_annotations[i].c_str();
+        if (i < constraints.num_variables()) {
+            std::cout << ", ";
+        }
         //values[i].as_bigint().print_hex();
-//    }
+    }
+    std::cout << "]\n";
 
     // output a
 
