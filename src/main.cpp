@@ -65,73 +65,67 @@ void r1cs_to_json(r1cs_constraint_system<FieldT> constraints)
 //    }
 
     // output a
-    std::cout << " a = [ ";
+
+    size_t last = -1;
+    std::cout << " a = [ \n";
     for (size_t c = 0; c < constraints.num_constraints(); ++c)
     {
         for (const linear_term<FieldT>& lt : constraints.constraints[c].a.terms)
-        {  
-//            std::cout << "\n[";
-//            for (uint i=0;i<=constraints.num_variables();++i) 
-//            {
-//                if(lt.index == i) {
-                    std::cout << "    ("<< c << ", " << lt.index << ")=" << lt.coeff;
-//                }
-//                else {
-//                    std::cout /*<< "    "<< c << ", " << i << "=>"*/ << "0";
-//                }
-//                if (i < constraints.num_variables()) {
-//                    std::cout << ",";
-//                }
-//            }
-//            std::cout << "]\n";
+        {
+            if (last == c) {  
+                std::cout << ",";
+            }
+            else {
+                std::cout << "    [";
+            }
+            std::cout << "("<< c << ", " << lt.index << ")=" << lt.coeff;
+            last = c;        
         }
+        std::cout << "]";
+
+
     }
     std::cout << "]\n";
     // output b
-    std::cout << " b = [ ";
+    std::cout << " b = [ \n";
+
+    last = -1;
     for (size_t c = 0; c < constraints.num_constraints(); ++c)
     {   
         for (const linear_term<FieldT>& lt : constraints.constraints[c].b.terms)
         {   
-//            std::cout << "\n[";
-//            for (uint i=0;i<=constraints.num_variables();++i)
-//            {   
-//                if(lt.index == i) {
-                    std::cout << "    ("<< c << ", " << lt.index << ")=" << lt.coeff;
-//                }
-//                else {
-//                    std::cout /*<< "    "<< c << ", " << i << "=>"*/ << "0";
-//                }
-//                if (i < constraints.num_variables()) {
-//                    std::cout << ",";
-//                }
-//            }
-//            std::cout << "]\n";
 
+            if (last == c) {  
+                std::cout << ",";
+            }
+            else {
+                std::cout << "    [";
+            }
+            std::cout << "("<< c << ", " << lt.index << ")=" << lt.coeff;
+            last = c;        
         }
+        std::cout << "]";
+
     }
     std::cout << "]\n";
     // output c
-    std::cout << " c = [ ";
+    std::cout << " c = [";
+    last = -1;
     for (size_t c = 0; c < constraints.num_constraints(); ++c)
     {   
+        std::cout << "\n";
         for (const linear_term<FieldT>& lt : constraints.constraints[c].c.terms)
         {   
-//            std::cout << "\n[";
-//            for (uint i=0;i<=constraints.num_variables();++i)
-//            {   
-//                if(lt.index == i) {
-                    std::cout << "    ("<< c << ", " << lt.index << ")=" << lt.coeff;
-//               }
-//                else {
-//                    std::cout /*<< "    "<< c << ", " << i << "=>"*/ << "0";
-//                }
-//                if (i < constraints.num_variables()) {
-//                    std::cout << ",";
-//               }
-//            }
-//            std::cout << "]\n";
+            if (last == c) { 
+                std::cout << ",";
+            }
+            else {
+                std::cout << "    [";
+            }
+            std::cout << "("<< c << ", " << lt.index << ")=" << lt.coeff;
+            last = c; 
         }
+        std::cout << "]";
     }
     std::cout << "]\n";
 }
