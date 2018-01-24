@@ -85,7 +85,7 @@ void r1cs_to_json(r1cs_constraint_system<FieldT> constraints)
 
 
     }
-    std::cout << "]\n";
+    std::cout << "\n]\n";
     // output b
     std::cout << " b = [ \n";
 
@@ -107,7 +107,7 @@ void r1cs_to_json(r1cs_constraint_system<FieldT> constraints)
         std::cout << "]";
 
     }
-    std::cout << "]\n";
+    std::cout << "\n]\n";
     // output c
     std::cout << " c = [";
     last = -1;
@@ -127,7 +127,7 @@ void r1cs_to_json(r1cs_constraint_system<FieldT> constraints)
         }
         std::cout << "]";
     }
-    std::cout << "]\n";
+    std::cout << "\n]\n";
 }
 
 
