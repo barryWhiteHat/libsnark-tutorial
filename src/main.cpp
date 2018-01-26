@@ -5,11 +5,18 @@
 
 #include <libsnark/gadgetlib1/gadgets/basic_gadgets.hpp>
 
+// default constraint system
+#include <libsnark/gadgetlib2/gadget.hpp>
+#include <libsnark/gadgetlib2/examples/simple_example.hpp>
+#include <libsnark/gadgetlib2/examples/simple_example.hpp>
+#include <libsnark/gadgetlib2/gadget.hpp>
 
-#include <libsnark/gadgetlib2/gadget.hpp>
-#include <libsnark/gadgetlib2/examples/simple_example.hpp>
-#include <libsnark/gadgetlib2/examples/simple_example.hpp>
-#include <libsnark/gadgetlib2/gadget.hpp>
+//hash
+#include <libff/common/profiling.hpp>
+#include <libff/common/utils.hpp>
+#include <libsnark/gadgetlib1/gadgets/hashes/sha256/sha256_gadget.hpp>
+
+
 
 using namespace libsnark;
 
@@ -179,17 +186,17 @@ void test_r1cs_gg_ppzksnark_gadgetlib2(size_t num_constraints, size_t input_size
 }
 
 
-template<typename ppT>
+template<typename FieldT>
 void test_r1cs_gg_ppzksnark(size_t num_constraints, size_t input_size)
 {
     const size_t new_num_constraints = num_constraints - 1;
-    protoboard<libff::Fr<ppT> > pb;
+    protoboard<libff::Fr<FieldT> > pb;
     // create variable A
-    pb_variable_array<libff::Fr<ppT> > A;
+    pb_variable_array<libff::Fr<FieldT> > A;
     // Create variable B
-    pb_variable_array<libff::Fr<ppT> > B;
+    pb_variable_array<libff::Fr<FieldT> > B;
     // Create variable res
-    pb_variable<libff::Fr<ppT> > res;
+    pb_variable<libff::Fr<FieldT> > res;
 
     res.allocate(pb, "res");
     A.allocate(pb, new_num_constraints, "A");
@@ -198,7 +205,7 @@ void test_r1cs_gg_ppzksnark(size_t num_constraints, size_t input_size)
     // where s = [1, A , B ] 
     // compute_inner_product generates `a`, `b`, `c` so that s . a * s . b - s . c = 0
     // note a!=A && b!=B
-    inner_product_gadget<libff::Fr<ppT> > compute_inner_product(pb, A, B, res, "compute_inner_product");
+    inner_product_gadget<libff::Fr<FieldT> > compute_inner_product(pb, A, B, res, "compute_inner_product");
 
     compute_inner_product.generate_r1cs_constraints();
     
@@ -217,8 +224,39 @@ void test_r1cs_gg_ppzksnark(size_t num_constraints, size_t input_size)
     // assert(bit);
 }
 
+
+template<typename FieldT>
+void hash_r1cs_gg_ppzksnark(size_t num_constraints, size_t input_size)
+{
+    protoboard<libff::Fr<FieldT>> pb;
+
+    digest_variable<libff::Fr<FieldT>> left(pb, SHA256_digest_size, "left");
+    digest_variable<libff::Fr<FieldT>> right(pb, SHA256_digest_size, "right");
+    digest_variable<libff::Fr<FieldT>> output(pb, SHA256_digest_size, "output");
+
+    sha256_two_to_one_hash_gadget<libff::Fr<FieldT>> f(pb, left, right, output, "f");
+    f.generate_r1cs_constraints();
+    printf("Number of constraints for sha256_two_to_one_hash_gadget: %zu\n", pb.num_constraints());
+
+    const libff::bit_vector left_bv = libff::int_list_to_bits({0x426bc2d8, 0x4dc86782, 0x81e8957a, 0x409ec148, 0xe6cffbe8, 0xafe6ba4f, 0x9c6f1978, 0xdd7af7e9}, 32);
+    const libff::bit_vector right_bv = libff::int_list_to_bits({0x038cce42, 0xabd366b8, 0x3ede7e00, 0x9130de53, 0x72cdf73d, 0xee825114, 0x8cb48d1b, 0x9af68ad0}, 32);
+    const libff::bit_vector hash_bv = libff::int_list_to_bits({0xeffd0b7f, 0x1ccba116, 0x2ee816f7, 0x31c62b48, 0x59305141, 0x990e5c0a, 0xce40d33d, 0x0b1167d1}, 32);
+
+    left.generate_r1cs_witness(left_bv);
+    right.generate_r1cs_witness(right_bv);
+
+    f.generate_r1cs_witness();
+    output.generate_r1cs_witness(hash_bv);
+    r1cs_to_json(pb.get_constraint_system());
+    assert(pb.is_satisfied()); 
+}
+
 int main () {
-    default_r1cs_gg_ppzksnark_pp::init_public_params();
-    test_r1cs_gg_ppzksnark<default_r1cs_gg_ppzksnark_pp>(4, 1);
+//    default_r1cs_gg_ppzksnark_pp::init_public_params();
+//    test_r1cs_gg_ppzksnark<default_r1cs_gg_ppzksnark_pp>(4, 1);
+    libff::start_profiling();
+    libff::default_ec_pp::init_public_params();
+
+    hash_r1cs_gg_ppzksnark<default_r1cs_gg_ppzksnark_pp>(4, 1);
     return 0;
 }
