@@ -59,87 +59,56 @@ bool run_r1cs_gg_ppzksnark(const r1cs_example<libff::Fr<ppT> > &example)
 }
 
 template<typename FieldT>
+void constraint_to_json(linear_combination<FieldT> constraints)
+{
+    std::cout << "{";
+    uint count = 0;
+    for (const linear_term<FieldT>& lt : constraints.terms)
+    {
+        if (count != 0) {
+            std::cout << ",";
+        }
+        if (lt.coeff != 0 && lt.coeff != 1) {
+            std::cout << '"' << lt.index << '"' << ":" << "-1";
+        }
+        else {
+            std::cout << '"' << lt.index << '"' << ":" << lt.coeff;
+        }
+        count++;
+    }
+    std::cout << "}";
+}
+
+template<typename FieldT>
 void r1cs_to_json(r1cs_constraint_system<FieldT> constraints)
 {
-
-
-// output inputs, right now need to compile with debug flag so that the `variable_annotations`
-// exists. Having trouble setting that up so will leave for now.
-    std::cout << " s = [    ";
+    // output inputs, right now need to compile with debug flag so that the `variable_annotations`
+    // exists. Having trouble setting that up so will leave for now.
+    std::cout << "\"r1cs\":\n{\n[";
     for (size_t i = 0; i < constraints.num_variables(); ++i)
     {   
-        std::cout << constraints.variable_annotations[i].c_str();
+        std::cout << '"' << constraints.variable_annotations[i].c_str() << '"';
         if (i < constraints.num_variables() - 1) {
             std::cout << ", ";
         }
-        //values[i].as_bigint().print_hex();
     }
-    std::cout << "]\n";
+    std::cout << "],\n";
 
-    // output a
-
-    size_t last = -1;
-    std::cout << " a = [ \n";
     for (size_t c = 0; c < constraints.num_constraints(); ++c)
     {
-        for (const linear_term<FieldT>& lt : constraints.constraints[c].a.terms)
-        {
-            if (last == c) {  
-                std::cout << ",";
-            }
-            else {
-                std::cout << "    [";
-            }
-            std::cout << "("<< c << ", " << lt.index << ")=" << lt.coeff;
-            last = c;        
+        std::cout << "[";
+        constraint_to_json(constraints.constraints[c].a);
+        std::cout << ",";
+        constraint_to_json(constraints.constraints[c].b);
+        std::cout << ",";
+        constraint_to_json(constraints.constraints[c].c);
+        if (c == constraints.num_constraints()-1 ) {
+            std::cout << "]\n";
+        } else {
+            std::cout << "],\n";
         }
-        std::cout << "]";
-
-
     }
-    std::cout << "\n]\n";
-    // output b
-    std::cout << " b = [ \n";
-
-    last = -1;
-    for (size_t c = 0; c < constraints.num_constraints(); ++c)
-    {   
-        for (const linear_term<FieldT>& lt : constraints.constraints[c].b.terms)
-        {   
-
-            if (last == c) {  
-                std::cout << ",";
-            }
-            else {
-                std::cout << "    [";
-            }
-            std::cout << "("<< c << ", " << lt.index << ")=" << lt.coeff;
-            last = c;        
-        }
-        std::cout << "]";
-
-    }
-    std::cout << "\n]\n";
-    // output c
-    std::cout << " c = [";
-    last = -1;
-    for (size_t c = 0; c < constraints.num_constraints(); ++c)
-    {   
-        std::cout << "\n";
-        for (const linear_term<FieldT>& lt : constraints.constraints[c].c.terms)
-        {   
-            if (last == c) { 
-                std::cout << ",";
-            }
-            else {
-                std::cout << "    [";
-            }
-            std::cout << "("<< c << ", " << lt.index << ")=" << lt.coeff;
-            last = c; 
-        }
-        std::cout << "]";
-    }
-    std::cout << "\n]\n";
+    std::cout << "}\n";
 }
 
 
@@ -256,7 +225,7 @@ int main () {
 //    test_r1cs_gg_ppzksnark<default_r1cs_gg_ppzksnark_pp>(4, 1);
     libff::start_profiling();
     libff::default_ec_pp::init_public_params();
-
+//    test_r1cs_gg_ppzksnark<default_r1cs_gg_ppzksnark_pp>(4, 1);
     hash_r1cs_gg_ppzksnark<default_r1cs_gg_ppzksnark_pp>(4, 1);
     return 0;
 }
