@@ -41,7 +41,19 @@ option(
 option(
   VERBOSE
   "Print internal messages"
+  ON
+)
+
+option(
+  DEBUG
+  "Enable debugging mode"
   OFF
+)
+
+option(
+  CPPDEBUG
+  "Enable debugging of C++ STL (does not imply DEBUG)"
+  ON
 )
 
 if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -70,6 +82,14 @@ endif()
 
 if("${MULTICORE}")
   add_definitions(-DMULTICORE=1)
+endif()
+
+
+add_definitions(-DDEBUG=1)
+
+
+if("${CPPDEBUG}")
+  add_definitions(-D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC)
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OPT_FLAGS}")
