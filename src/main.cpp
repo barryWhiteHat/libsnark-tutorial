@@ -84,7 +84,7 @@ void r1cs_to_json(r1cs_constraint_system<FieldT> constraints)
 {
     // output inputs, right now need to compile with debug flag so that the `variable_annotations`
     // exists. Having trouble setting that up so will leave for now.
-    std::cout << "\"r1cs\":\n{\n[";
+    std::cout << "\n{\n[";
     for (size_t i = 0; i < constraints.num_variables(); ++i)
     {   
         std::cout << '"' << constraints.variable_annotations[i].c_str() << '"';
@@ -225,7 +225,7 @@ int main () {
 //    test_r1cs_gg_ppzksnark<default_r1cs_gg_ppzksnark_pp>(4, 1);
     libff::start_profiling();
     libff::default_ec_pp::init_public_params();
-//    test_r1cs_gg_ppzksnark<default_r1cs_gg_ppzksnark_pp>(4, 1);
-    hash_r1cs_gg_ppzksnark<default_r1cs_gg_ppzksnark_pp>(4, 1);
+    test_r1cs_gg_ppzksnark<default_r1cs_gg_ppzksnark_pp>(4, 1);
+//    hash_r1cs_gg_ppzksnark<default_r1cs_gg_ppzksnark_pp>(4, 1);
     return 0;
 }
