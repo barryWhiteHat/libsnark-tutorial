@@ -84,10 +84,6 @@ void r1cs_to_json(r1cs_constraint_system<FieldT> constraints, uint input_variabl
 {
     // output inputs, right now need to compile with debug flag so that the `variable_annotations`
     // exists. Having trouble setting that up so will leave for now.
-    std::cout << constraints.num_variables() << "\n";
-    std::cout << constraints.num_inputs() << "\n";
-    std::cout << constraints.num_constraints() << "\n";
-
     std::cout << "\n{\"variables\":[";
     for (size_t i = 0; i < input_variables + 1; ++i) 
     {   
@@ -113,7 +109,7 @@ void r1cs_to_json(r1cs_constraint_system<FieldT> constraints, uint input_variabl
             std::cout << "],\n";
         }
     }
-    std::cout << "]}\n"; 
+    std::cout << "]}\n";
 }
 
 
