@@ -80,28 +80,28 @@ void constraint_to_json(linear_combination<FieldT> constraints)
 }
 
 template<typename FieldT>
-void r1cs_to_json(r1cs_constraint_system<FieldT> constraints)
+void r1cs_to_json(r1cs_constraint_system<FieldT> constraints, uint input_variables)
 {
     // output inputs, right now need to compile with debug flag so that the `variable_annotations`
     // exists. Having trouble setting that up so will leave for now.
-    std::cout << "\n{\"variableMetaData\":[";
-    for (size_t i = 0; i < constraints.num_variables(); ++i)
+    std::cout << "\n{\"variables\":[";
+    for (size_t i = 0; i < input_variables + 1; ++i) 
     {   
         std::cout << '"' << constraints.variable_annotations[i].c_str() << '"';
-        if (i < constraints.num_variables() - 1) {
+        if (i < input_variables ) {
             std::cout << ", ";
         }
     }
     std::cout << "],\n";
     std::cout << "\"constraints\":[";
-
+    
     for (size_t c = 0; c < constraints.num_constraints(); ++c)
     {
-        std::cout << "[";
+        std::cout << "[";// << "\"A\"=";
         constraint_to_json(constraints.constraints[c].a);
-        std::cout << ",";
+        std::cout << ",";// << "\"B\"=";
         constraint_to_json(constraints.constraints[c].b);
-        std::cout << ",";
+        std::cout << ",";// << "\"A\"=";;
         constraint_to_json(constraints.constraints[c].c);
         if (c == constraints.num_constraints()-1 ) {
             std::cout << "]\n";
@@ -188,7 +188,7 @@ void test_r1cs_gg_ppzksnark(size_t num_constraints, size_t input_size)
     // Gernerate a witness for these values.
     compute_inner_product.generate_r1cs_witness();
     // output r1cs as json
-    r1cs_to_json(pb.get_constraint_system());
+    r1cs_to_json(pb.get_constraint_system(), 7);
     // generate proving/verification key.
     // const bool bit = run_r1cs_gg_ppzksnark<ppT>(example);
     // assert(bit);
@@ -217,7 +217,8 @@ void hash_r1cs_gg_ppzksnark(size_t num_constraints, size_t input_size)
 
     f.generate_r1cs_witness();
     output.generate_r1cs_witness(hash_bv);
-    r1cs_to_json(pb.get_constraint_system());
+    // left = 256 , right = 256, output = 256 , 256 * 3 = 768 
+    r1cs_to_json(pb.get_constraint_system(), 256*3 ); 
     assert(pb.is_satisfied()); 
 }
 
@@ -226,7 +227,7 @@ int main () {
 //    test_r1cs_gg_ppzksnark<default_r1cs_gg_ppzksnark_pp>(4, 1);
     libff::start_profiling();
     libff::default_ec_pp::init_public_params();
-//    test_r1cs_gg_ppzksnark<default_r1cs_gg_ppzksnark_pp>(4, 1);
-    hash_r1cs_gg_ppzksnark<default_r1cs_gg_ppzksnark_pp>(4, 1);
+    test_r1cs_gg_ppzksnark<default_r1cs_gg_ppzksnark_pp>(4, 1);
+//    hash_r1cs_gg_ppzksnark<default_r1cs_gg_ppzksnark_pp>(4, 1);
     return 0;
 }
