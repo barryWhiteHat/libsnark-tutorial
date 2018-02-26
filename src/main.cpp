@@ -262,7 +262,7 @@ void hash_r1cs_gg_ppzksnark(size_t num_constraints)
     output.generate_r1cs_witness(hash_bv);
     // left = 256 , right = 256, output = 256 , 256 * 3 = 768 
     r1cs_to_json(pb, 256*3, "r1cs.json"); 
-    dump_key(pb, "vk.json");
+    dump_key(pb, "key.json");
     assert(pb.is_satisfied()); 
 }
 
