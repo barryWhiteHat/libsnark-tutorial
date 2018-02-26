@@ -238,49 +238,6 @@ void dump_key(protoboard<FieldT> pb, std::string path)
 
 }
 
-
-template<typename FieldT>
-void test_r1cs_ppzksnark(size_t num_constraints)
-{
-    const size_t new_num_constraints = num_constraints - 1;
-    protoboard<libff::Fr<FieldT>> pb;
-    // create variable A
-    pb_variable_array<libff::Fr<FieldT> > A;
-    // Create variable B
-    pb_variable_array<libff::Fr<FieldT> > B;
-    // Create variable res
-    pb_variable<libff::Fr<FieldT> > res;
-
-    res.allocate(pb, "res");
-    A.allocate(pb, new_num_constraints, "A");
-    B.allocate(pb, new_num_constraints, "B");
-
-    // where s = [1, A , B ] 
-    // compute_inner_product generates `a`, `b`, `c` so that s . a * s . b - s . c = 0
-    // note a!=A && b!=B
-    inner_product_gadget<libff::Fr<FieldT> > compute_inner_product(pb, A, B, res, "compute_inner_product");
-
-    compute_inner_product.generate_r1cs_constraints();
-    
-    for (size_t i = 0; i < new_num_constraints; ++i)
-    {
-        // set all inputs to 1 except for the first and last.
-        pb.val(A[i]) = 1;
-        pb.val(B[i]) = 1;
-    }
-    // Gernerate a witness for these values.
-    compute_inner_product.generate_r1cs_witness();
-    compute_inner_product.generate_r1cs_witness();
-    assert(pb.is_satisfied());
-    // output r1cs as json
-    r1cs_to_json(pb, 7, "r1cs.json");
-    array_to_json(pb, 7, "tests.json");
-    // output input variable for testing
-    dump_key(pb, "key.json");
-    
-}
-
-
 template<typename FieldT>
 void hash_r1cs_gg_ppzksnark(size_t num_constraints)
 {
@@ -304,15 +261,14 @@ void hash_r1cs_gg_ppzksnark(size_t num_constraints)
     f.generate_r1cs_witness();
     output.generate_r1cs_witness(hash_bv);
     // left = 256 , right = 256, output = 256 , 256 * 3 = 768 
-    r1cs_to_json(pb.get_constraint_system(), 256*3, "r1cs.json" ); 
-    dump_key(pb, 256*3);
+    r1cs_to_json(pb, 256*3, "r1cs.json"); 
+    dump_key(pb, "vk.json");
     assert(pb.is_satisfied()); 
 }
 
 int main () {
 
     libff::alt_bn128_pp::init_public_params();
-    test_r1cs_ppzksnark<alt_bn128_pp>(4);
-//    hash_r1cs_gg_ppzksnark<alt_bn128_pp>(4);
+    hash_r1cs_gg_ppzksnark<alt_bn128_pp>(4);
     return 0;
 }
