@@ -254,7 +254,7 @@ void test_r1cs_ppzksnark(size_t num_constraints)
     res.allocate(pb, "res");
     A.allocate(pb, new_num_constraints, "A");
     B.allocate(pb, new_num_constraints, "B");
-
+    pb.set_input_sizes(1);
     // where s = [1, A , B ] 
     // compute_inner_product generates `a`, `b`, `c` so that s . a * s . b - s . c = 0
     // note a!=A && b!=B
@@ -272,11 +272,18 @@ void test_r1cs_ppzksnark(size_t num_constraints)
     compute_inner_product.generate_r1cs_witness();
     compute_inner_product.generate_r1cs_witness();
     assert(pb.is_satisfied());
-    // output r1cs as json
+    std::cout << "num vars: " << pb.num_variables() << "\n";   // output r1cs as json
     r1cs_to_json(pb, 7, "r1cs.json");
     array_to_json(pb, 7, "tests.json");
     // output input variable for testing
-    dump_key(pb, "key.json");
+    // dump_key(pb, "key.json");
+    r1cs_primary_input <libff::Fr<FieldT>> primary_input = pb.primary_input();
+    r1cs_auxiliary_input <libff::Fr<FieldT>> auxiliary_input = pb.auxiliary_input();
+
+
+    exportInput(primary_input);
+    exportInput(auxiliary_input);
+
     
 }
 
